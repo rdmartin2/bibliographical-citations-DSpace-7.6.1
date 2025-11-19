@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Citas Académicas</title>
+
+    <!-- Metadatos de Ejemplo (se mantienen los anteriores) -->
+    <meta name="title" content="Migración de DSpace de la versión 5 a la 7.6.1">
+    <meta name="citation_title" content="Migración de DSpace de la versión 5 a la 7.6.1">
+    <meta name="citation_author" content="Diaz Martin, Ruben Felipe">
+    <meta name="citation_author" content="Organizacion UCLV">
+    <meta name="citation_author" content="Yadelys Martin">
+    <meta name="citation_author" content="Anna">
+    <meta name="citation_publication_date" content="2024-05">
+    <meta name="citation_language" content="es">
+    <meta name="citation_publisher" content="Universidad Central UCLV">
+    <meta name="citation_abstract_html_url" content="http://localhost:4000/handle/123456789/7">
+    <meta name="citation_pdf_url" content="http://localhost:4000/bitstreams/8c968aad-d57f-4ba1-a764-d84080ecb4a1/download">
+    <meta name="citation_keywords" content="Educación::Sistemas y niveles de enseñanza::Educación urbana; Educación; naturaleza">
+    <meta name="description" content="UCLV asdsa asdsaasd asd">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados y fuente Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        /* Estilo para cursivas en la salida de la cita */
+        #citationOutput i {
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto mt-5">
+
+        <!-- Título principal -->
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+            Generador de Citas Académicas
+        </h1>
+        
+        <!-- CUADRO DE CITACIÓN -->
+        <div class="bg-white shadow-xl rounded-xl p-6 mb-8">
+            <div class="border-b pb-4 mb-4">
+                <h2 class="text-xl font-semibold text-blue-600">Cómo citar este documento</h2>
+            </div>
+            
+            <!-- Contenedor de la Cita -->
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4 text-gray-700 leading-relaxed" 
+                 id="citationOutput" 
+                 style="min-height: 120px; white-space: pre-wrap; word-wrap: break-word;" 
+                 aria-readonly="true">
+                Cargando APA 7ma Edición por defecto...
+            </div>
+            
+            <!-- Controles -->
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                
+                <!-- Dropdown de Estilos -->
+                <div class="relative inline-block text-left w-full sm:w-auto">
+                    <button id="citationStylesButton" type="button" 
+                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                            aria-expanded="false" 
+                            aria-haspopup="true"
+                            onclick="toggleDropdown('styleDropdownMenu')">
+                        <span id="currentStyleText">Estilos de citación</span>
+                        <!-- Icono SVG de flecha hacia abajo -->
+                        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <div id="styleDropdownMenu" class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 hidden" role="menu" aria-orientation="vertical" aria-labelledby="citationStylesButton">
+                        <div class="py-1" role="none">
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="apa7" data-style-name="APA 7ma Edición" onclick="displayCitation('apa7')">APA 7ma Edición</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="apa6" data-style-name="APA 6ta Edición" onclick="displayCitation('apa6')">APA 6ta Edición</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="iso690" data-style-name="ISO 690" onclick="displayCitation('iso690')">ISO 690</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="icontec" data-style-name="NTC 5613 (Icontec)" onclick="displayCitation('icontec')">NTC 5613 (Icontec)</a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="chicago" data-style-name="Chicago" onclick="displayCitation('chicago')">Chicago</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="harvard" data-style-name="Harvard" onclick="displayCitation('harvard')">Harvard</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="ieee" data-style-name="IEEE" onclick="displayCitation('ieee')">IEEE</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="mla" data-style-name="MLA" onclick="displayCitation('mla')">MLA</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="turabian" data-style-name="Turabian" onclick="displayCitation('turabian')">Turabian</a>
+                            <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" data-style-key="vancouver" data-style-name="Vancouver" onclick="displayCitation('vancouver')">Vancouver</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Copiar -->
+                <button class="w-full sm:w-auto px-4 py-2 text-sm font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out shadow-md" onclick="copyCitation()">
+                    Copiar Cita
+                </button>
+            </div>
+        </div>
+
+        <!-- MENÚ DE DESCARGA -->
+        <div class="relative inline-block text-left">
+            <button id="downloadStylesButton" type="button" 
+                    class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                    onclick="toggleDropdown('downloadDropdownMenu')">
+                Descargar Cita
+                <!-- Icono SVG de flecha hacia abajo -->
+                <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <div id="downloadDropdownMenu" class="origin-top-left absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 hidden">
+                <div class="py-1">
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('bibtex')">BibTeX <i>(.bib)</i></a>
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('ris')">RefMan <i>(.ris)</i></a>
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('zotero_rdf')">Zotero RDF <i>(.rdf)</i></a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('csl_json')">CSL JSON <i>(.json)</i></a>
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('endnote_xml')">EndNote XML <i>(.xml)</i></a>
+                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" onclick="downloadCitation('endnote')">EndNote Legacy <i>(.enw)</i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mapa de estilos para mostrar el nombre completo en el botón
+        const styleMap = {
+            'apa7': 'APA 7ma Edición',
+            'apa6': 'APA 6ta Edición',
+            'chicago': 'Chicago',
+            'harvard': 'Harvard',
+            'ieee': 'IEEE',
+            'mla': 'MLA',
+            'turabian': 'Turabian',
+            'vancouver': 'Vancouver',
+            'iso690': 'ISO 690', // Nuevo estilo
+            'icontec': 'NTC 5613 (Icontec)' // Nuevo estilo
+        };
+
+        // Función para manejar el dropdown (ya no dependemos de Bootstrap JS)
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Ejecutar APA 7ma al cargar la página
+        window.onload = () => {
+            displayCitation('apa7');
+        };
+
+        // Función para obtener metadatos de un elemento HTML
+        function getMetadata() {
+            // Nota: Se asume que el formato de autor es "Apellido, Nombre(s)"
+            return {
+                title: document.querySelector('meta[name="citation_title"]')?.getAttribute("content") || "",
+                authors: Array.from(document.querySelectorAll('meta[name="citation_author"]')).map((meta) => meta.getAttribute("content") || ""),
+                publicationDate: document.querySelector('meta[name="citation_publication_date"]')?.getAttribute("content") || "", // YYYY-MM
+                institution: document.querySelector('meta[name="citation_dissertation_institution"]')?.getAttribute("content") || "",
+                dissertationName: document.querySelector('meta[name="citation_dissertation_name"]')?.getAttribute("content") || "",
+                keywords: document.querySelector('meta[name="citation_keywords"]')?.getAttribute("content") || "",
+                abstractUrl: document.querySelector('meta[name="citation_abstract_html_url"]')?.getAttribute("content") || "",
+                isbn: document.querySelector('meta[name="citation_isbn"]')?.getAttribute("content") || "",
+                publisher: document.querySelector('meta[name="citation_publisher"]')?.getAttribute("content") || "",
+                description: document.querySelector('meta[name="description"]')?.getAttribute("content") || "",
+                language: document.querySelector('meta[name="citation_language"]')?.getAttribute("content") || ""
+            };
+        }
+
+        // Obtiene la abreviatura del mes dado un número de mes
+        function getMonthAbbreviation(monthNumber) {
+            const monthAbbreviations = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+            return monthAbbreviations[parseInt(monthNumber, 10) - 1] || "";
+        }
+
+        // Función auxiliar para formatear autores al estilo "Apellido, Inicial." (para APA)
+        function formatAuthorAPA(author) {
+            const parts = author.split(', '); // Asume "Apellido, Nombre(s)"
+            const family = parts[0];
+            // Tomar solo las iniciales de los nombres, seguido de un punto
+            const givenNames = parts.slice(1).join(' ').split(' ').filter(n => n.length > 0);
+            let initials = givenNames.map(name => name.charAt(0) + '.').join('');
+            return `${family}, ${initials}`.trim();
+        }
+
+        // --- FUNCIONES DE CITACIÓN ---
+
+        // Genera cita estilo APA 7ma Edición
+        function generateAPA7(metadata) {
+            const authors = metadata.authors;
+            const year = metadata.publicationDate ? `(${metadata.publicationDate.substring(0, 4)}). ` : '';
+            const title = metadata.title ? `<i>${metadata.title}</i>. ` : '';
+            const publisher = metadata.publisher ? `${metadata.publisher}. ` : '';
+            const url = metadata.abstractUrl ? `Recuperado de ${metadata.abstractUrl}` : '';
+
+            let authorString = "";
+            if (authors.length === 1) {
+                authorString = formatAuthorAPA(authors[0]);
+            } else if (authors.length <= 20) {
+                // APA 7ma: Usa '&' para el último autor cuando hay 2 a 20 autores.
+                authorString = authors.slice(0, -1).map(formatAuthorAPA).join(', ');
+                authorString += (authors.length > 1 ? ` & ${formatAuthorAPA(authors[authors.length - 1])}` : '');
+            } else {
+                // Más de 20 autores: primeros 19, puntos suspensivos, y el último.
+                authorString = authors.slice(0, 19).map(formatAuthorAPA).join(', ') + `... ${formatAuthorAPA(authors[authors.length - 1])}`;
+            }
+            
+            return `${authorString}. ${year}${title}${publisher}${url}`.trim();
+        }
+        
+        // Genera cita estilo APA 6ta Edición (Diferencias clave: uso de 'et al.' y número de autores)
+        function generateAPA6(metadata) {
+            const authors = metadata.authors;
+            const year = metadata.publicationDate ? `(${metadata.publicationDate.substring(0, 4)}). ` : '';
+            const title = metadata.title ? `<i>${metadata.title}</i>. ` : ''; 
+            const publisher = metadata.publisher ? `${metadata.publisher}. ` : '';
+            const url = metadata.abstractUrl ? `Recuperado de ${metadata.abstractUrl}` : '';
+
+            let authorString = "";
+            if (authors.length <= 7) {
+                // APA 6ta: Usa '&' para el último autor cuando hay hasta 7 autores.
+                authorString = authors.slice(0, -1).map(formatAuthorAPA).join(', ');
+                authorString += (authors.length > 1 ? ` & ${formatAuthorAPA(authors[authors.length - 1])}` : '');
+            } else {
+                // APA 6ta: Si hay 8 o más, se listan los primeros 6, se usan puntos suspensivos, y el último.
+                authorString = authors.slice(0, 6).map(formatAuthorAPA).join(', ') + `, ... ${formatAuthorAPA(authors[authors.length - 1])}`;
+            }
+            
+            return `${authorString}. ${year}${title}${publisher}${url}`.trim();
+        }
+
+        // Genera cita estilo Chicago (Notas y Bibliografía)
+        function generateChicago(metadata) {
+            const authors = metadata.authors;
+            const year = metadata.publicationDate ? `, ${metadata.publicationDate.substring(0, 4)}` : '';
+            const title = metadata.title ? `"${metadata.title}." <i>` : ''; // Título entre comillas y cursiva
+            const publisher = metadata.publisher ? `${metadata.publisher}</i>, ` : '';
+            const url = metadata.abstractUrl ? `${metadata.abstractUrl}.` : '';
+
+            let authorString = "";
+            // Chicago B (Notes and Bibliography) - Entry
+            if (authors.length === 1) {
+                authorString = `${authors[0].split(', ')[0]}, ${authors[0].split(', ').slice(1).join(' ')}`; // Apellido, Nombre
+            } else if (authors.length === 2) {
+                const author1 = authors[0].split(', ');
+                const author2 = authors[1].split(', ');
+                authorString = `${author1[0]}, ${author1.slice(1).join(' ')} and ${author2.slice(1).join(' ')} ${author2[0]}`;
+            } else if (authors.length > 2) {
+                const author1 = authors[0].split(', ');
+                authorString = `${author1[0]}, ${author1.slice(1).join(' ')} et al.`;
+            }
+
+            return `${authorString}. ${year}. ${title}${publisher}${url}`.trim();
+        }
+
+        // Genera cita estilo Harvard (simplificado)
+        function generateHarvard(metadata) {
+            const authors = metadata.authors.map(author => author.split(', ')[0]).join(' & '); // Solo apellido
+            const year = metadata.publicationDate ? `(${metadata.publicationDate.substring(0, 4)}) ` : '';
+            const title = metadata.title ? `<i>${metadata.title}</i>. ` : '';
+            const publisher = metadata.publisher ? `${metadata.publisher}. ` : '';
+            const url = metadata.abstractUrl ? `Available at: ${metadata.abstractUrl}` : '';
+
+            return `${authors} ${year}${title}${publisher}${url}`.trim();
+        }
+
+        // Genera cita estilo IEEE (simplificado)
+        function generateIEEE(metadata) {
+            const authors = metadata.authors.map(author => {
+                const parts = author.split(', ');
+                return parts.slice(1).join(' ').charAt(0) + '. ' + parts[0];
+            }).join('; ');
+            const title = metadata.title ? `"${metadata.title}," ` : '';
+            const publisher = metadata.publisher ? `${metadata.publisher}, ` : '';
+            const year = metadata.publicationDate ? `(${metadata.publicationDate.substring(0, 4)}). ` : '';
+            const url = metadata.abstractUrl ? `Available: ${metadata.abstractUrl}` : '';
+
+            // Notar que IEEE requiere números. Usamos [1] como marcador de posición.
+            return `[1] ${authors}, ${title}${publisher}${year}${url}`.trim();
+        }
+
+        // Genera cita estilo MLA (simplificado)
+        function generateMLA(metadata) {
+            const authors = metadata.authors.map((author, index) => {
+                const parts = author.split(', ');
+                if (index === 0) {
+                    return `${parts[0]}, ${parts.slice(1).join(' ')}.`;
+                } else {
+                    return `${parts.slice(1).join(' ')} ${parts[0]}`;
+                }
+            }).join(' ');
+
+            let authorsString = authors;
+            if (metadata.authors.length > 3) {
+                const parts = metadata.authors[0].split(', ');
+                authorsString = `${parts[0]}, ${parts.slice(1).join(' ')}, et al.`;
+            }
+
+            const title = metadata.title ? `"${metadata.title}." ` : '';
+            const publisher = metadata.publisher ? `<i>${metadata.publisher}</i>, ` : ''; // MLA italiza el contenedor (ej. revista)
+            const year = metadata.publicationDate ? `${metadata.publicationDate.substring(0, 4)}, ` : '';
+            const url = metadata.abstractUrl ? `${metadata.abstractUrl}.` : '';
+
+            return `${authorsString} ${title}${publisher}${year}${url}`.trim();
+        }
+
+        // Genera cita estilo Turabian (similar a Chicago)
+        function generateTurabian(metadata) {
+            return generateChicago(metadata);
+        }
+
+        // Genera cita estilo Vancouver (simplificado)
+        function generateVancouver(metadata) {
+            const authors = metadata.authors.map(author => {
+                const parts = author.split(', ');
+                // Formato Apellido y primer nombre (ej. Diaz RF)
+                const family = parts[0].trim();
+                const initials = parts.slice(1).join(' ').split(' ').map(name => name.charAt(0)).join('').toUpperCase();
+                return family + initials; 
+            }).join(', ');
+            
+            const title = metadata.title ? `${metadata.title}. ` : '';
+            const year = metadata.publicationDate ? `${metadata.publicationDate.substring(0, 4)}. ` : '';
+            const publisher = metadata.publisher ? `${metadata.publisher}. ` : '';
+            const currentDate = new Date();
+            const url = metadata.abstractUrl ? `[cited ${currentDate.getFullYear()} ${currentDate.getMonth()+1} ${currentDate.getDate()}]. Available from: ${metadata.abstractUrl}` : '';
+
+            return `${authors}. ${title}${publisher}${year}${url}`.trim();
+        }
+
+        // NUEVO ESTILO: ISO 690 (Referencia Electrónica simplificada)
+        function generateISO690(metadata) {
+            const authors = metadata.authors;
+            const year = metadata.publicationDate ? ` ${metadata.publicationDate.substring(0, 4)}` : '';
+            const title = metadata.title ? `<i>${metadata.title}</i>. ` : '';
+            const publisher = metadata.publisher ? `${metadata.publisher},` : '';
+            const url = metadata.abstractUrl ? ` Disponible en: <${metadata.abstractUrl}>` : '';
+
+            let authorString = authors.map(author => {
+                const parts = author.split(', '); // [Apellido, Nombre(s)]
+                return `${parts[0].toUpperCase()}, ${parts.slice(1).join(' ')}`;
+            }).join('; ');
+
+            return `${authorString}. ${title}${publisher}${year}${url}`.trim();
+        }
+
+        // NUEVO ESTILO: NTC 5613 (Icontec) - Tesis / Documento Electrónico simplificado
+        function generateIcontec(metadata) {
+            const authors = metadata.authors;
+            const year = metadata.publicationDate ? `, ${metadata.publicationDate.substring(0, 4)}` : '';
+            const title = metadata.title ? `${metadata.title}. ` : ''; // No cursivas para el título principal
+            const publisher = metadata.publisher ? `[Ciudad no especificada]: ${metadata.publisher}` : '';
+            const url = metadata.abstractUrl ? ` Disponible en: ${metadata.abstractUrl}` : '';
+
+            let authorString = '';
+            // Icontec: Se escriben los apellidos en mayúsculas, luego nombre(s)
+            if (authors.length <= 1) {
+                const parts = authors[0].split(', ');
+                authorString = `${parts[0].toUpperCase()}, ${parts.slice(1).join(' ')}.`;
+            } else {
+                // Para 2 o más, se suele usar solo el primer autor en la lista de referencias o seguir el orden.
+                // Aquí, usaremos la notación del primer autor para simplificar
+                const parts = authors[0].split(', ');
+                authorString = `${parts[0].toUpperCase()}, ${parts.slice(1).join(' ')} y otros.`;
+            }
+            
+            return `${authorString} ${title}${publisher}${year}.${url}`.trim();
+        }
+
+        // Función para mostrar la cita en el cuadro de texto
+        function displayCitation(style) {
+            const metadata = getMetadata();
+            let citationText = "";
+
+            // Ocultar todos los dropdowns
+            document.getElementById('styleDropdownMenu').classList.add('hidden');
+            document.getElementById('downloadDropdownMenu').classList.add('hidden');
+
+            switch (style) {
+                case "apa7":
+                    citationText = generateAPA7(metadata);
+                    break;
+                case "apa6":
+                    citationText = generateAPA6(metadata);
+                    break;
+                case "chicago":
+                    citationText = generateChicago(metadata);
+                    break;
+                case "harvard":
+                    citationText = generateHarvard(metadata);
+                    break;
+                case "ieee":
+                    citationText = generateIEEE(metadata);
+                    break;
+                case "mla":
+                    citationText = generateMLA(metadata);
+                    break;
+                case "turabian":
+                    citationText = generateTurabian(metadata);
+                    break;
+                case "vancouver":
+                    citationText = generateVancouver(metadata);
+                    break;
+                case "iso690": // Nuevo
+                    citationText = generateISO690(metadata);
+                    break;
+                case "icontec": // Nuevo
+                    citationText = generateIcontec(metadata);
+                    break;
+                default:
+                    citationText = "Estilo de citación no implementado o no seleccionado.";
+            }
+
+            // 1. Actualiza el contenido del div (permite HTML para cursivas)
+            document.getElementById("citationOutput").innerHTML = citationText;
+
+            // 2. Actualiza el texto del botón desplegable
+            document.getElementById("currentStyleText").innerText = styleMap[style] || "Estilos de citación";
+
+            // 3. Marca el elemento activo en el menú (actualización para Tailwind)
+            document.querySelectorAll('#styleDropdownMenu a').forEach(item => {
+                item.classList.remove('bg-blue-100', 'text-blue-700');
+                if (item.getAttribute('data-style-key') === style) {
+                    item.classList.add('bg-blue-100', 'text-blue-700');
+                }
+            });
+        }
+
+        // Función para copiar el texto de la cita (eliminando las etiquetas <i>)
+        function copyCitation() {
+            const citationOutputDiv = document.getElementById("citationOutput");
+            
+            // Obtener el texto, eliminando las etiquetas <i> y </i>
+            let plainText = citationOutputDiv.innerHTML;
+            plainText = plainText.replace(/<\/?i>/g, ''); // Reemplaza <i> y </i>
+            
+            // Usar un textarea temporal para copiar al portapapeles
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = plainText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            // Reemplaza document.execCommand("copy") para mayor compatibilidad en entornos modernos, 
+            // aunque mantenemos execCommand como fallback si navigator.clipboard no está disponible.
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(plainText).then(() => {
+                    showMessage("Cita copiada!");
+                }).catch(() => {
+                    // Fallback to document.execCommand for restricted environments
+                    document.execCommand("copy");
+                    showMessage("Cita copiada!");
+                });
+            } else {
+                document.execCommand("copy");
+                showMessage("Cita copiada!");
+            }
+            
+            document.body.removeChild(tempTextArea);
+        }
+
+        // Muestra un mensaje temporal en el botón "Copiar Cita"
+        function showMessage(message) {
+            const copyButton = document.querySelector('button[onclick="copyCitation()"]');
+            const originalButtonText = copyButton.innerHTML;
+            const originalClasses = copyButton.className;
+            
+            copyButton.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${message}`;
+            copyButton.className = "w-full sm:w-auto px-4 py-2 text-sm font-medium rounded-md text-white bg-green-700 transition duration-150 ease-in-out shadow-md"; // Cambio de color temporal
+            copyButton.disabled = true;
+
+            setTimeout(() => {
+                copyButton.innerHTML = originalButtonText; // Restaurar texto original
+                copyButton.className = originalClasses;
+                copyButton.disabled = false;
+            }, 1500); 
+        }
+
+        // ----------------------------------------------------
+        // Funciones de Generación de Archivos (MANTENIDAS)
+        // ----------------------------------------------------
+
+        function generateBibTeX(metadata) {
+            let output = "@thesis{" + (metadata.authors[0] ? metadata.authors[0].split(', ')[0].toLowerCase() : 'doc') + metadata.publicationDate.substring(0, 4) + ",\n";
+            if (metadata.title) {
+                output += "  title = {" + metadata.title + "}," + "\n";
+            }
+            if (metadata.authors && metadata.authors.length > 0) {
+                output += "  author = {" + metadata.authors.map(author => author.split(', ').reverse().join(' ')).join(" and ") + "},\n"; 
+            }
+            if (metadata.publicationDate) {
+                output += "  year = {" + metadata.publicationDate.substring(0, 4) + "}," + "\n";
+                const dateParts = metadata.publicationDate.split("-");
+                if (dateParts.length > 1) {
+                    output += "  month = {" + getMonthAbbreviation(dateParts[1]) + "}," + "\n";
+                }
+            }
+            if (metadata.isbn) { output += "  isbn = {" + metadata.isbn + "}," + "\n"; }
+            if (metadata.institution) { output += "  institution = {" + metadata.institution + "}," + "\n"; }
+            if (metadata.dissertationName) { output += `  note = {` + metadata.dissertationName + `},` + "\n"; } 
+            else if (metadata.description) { output += `  note = {` + metadata.description + `},` + "\n"; }
+            if (metadata.keywords) { output += "  keywords = {" + metadata.keywords + "}," + "\n"; }
+            if (metadata.abstractUrl) { output += "  url = {" + metadata.abstractUrl + "}" + "\n"; }
+            output += ' school= {Universidad Central "Marta Abreu" de Las Villas}\n';
+            return output + "}";
+        }
+
+        function generateRIS(metadata) {
+            let output = `TY  - THES\n`; 
+            if (metadata.title) { output += `TI  - ${metadata.title.replace("\n", "\n      ")}\n`; }
+            if (metadata.authors) { output += metadata.authors.map((author) => "AU  - " + author + "\n").join(""); }
+            if (metadata.publicationDate) { output += `PY  - ${metadata.publicationDate.substring(0, 4)}\n`; }
+            if (metadata.isbn) { output += `SN  - ${metadata.isbn}\n`; }
+            if (metadata.language) { output += `LA  - ${metadata.language}\n`; }
+            if (metadata.keywords) { output += `KW  - ${metadata.keywords.split("; ").join("\nKW  - ")}\n`; }
+            if (metadata.abstractUrl) { output += `UR  - ${metadata.abstractUrl}\n`; }
+            if (metadata.publisher) { output += `PB  - ${metadata.publisher}\n`; }
+            if (metadata.description) { output += `AB  - ${metadata.description.split(`\n`).join(`\n      `)}\n`; }
+            output += `ER -`;
+            return output;
+        }
+
+        function generateEndNote(metadata) {
+            let output = "%0 Thesis";
+            const T = metadata.title ? "\n%T " + metadata.title : "";
+            const A = metadata.authors.length > 0 ? metadata.authors.map((author) => "\n%A " + author).join("") : "";
+            const D = metadata.publicationDate ? "\n%D " + metadata.publicationDate : "";
+            const arroba = metadata.isbn ? "\n%@ " + metadata.isbn : "";
+            const L = metadata.language ? "\n%L " + metadata.language : "";
+            const K = metadata.keywords ? metadata.keywords.split("; ").map(k => "\n%K " + k).join("") : "";
+            const U = metadata.abstractUrl ? "\n%U " + metadata.abstractUrl : "";
+            const I = metadata.publisher ? "\n%I " + metadata.publisher : "";
+            const X = metadata.description ? "\n%X " + metadata.description : "";
+
+            output += T + A + D + arroba + L + K + U + I + X;
+            return output;
+        }
+        
+        function generateZoteroRDF(metadata) {
+            let output = `<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:bib="http://purl.org/net/biblio#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/">
+<bib:Thesis rdf:about="${metadata.abstractUrl || 'urn:uuid:placeholder'}">
+    <dc:title>${metadata.title || ''}</dc:title>
+    <dc:date>${metadata.publicationDate?.substring(0, 4) || ''}</dc:date>
+    <dc:publisher>${metadata.publisher || ''}</dc:publisher>
+    <dc:language>${metadata.language || ''}</dc:language>
+    <prism:url>${metadata.abstractUrl || ''}</prism:url>
+    <dc:description>${metadata.description || ''}</dc:description>
+    <dc:type>Thesis</dc:type>
+    <dc:creator>
+        <rdf:Seq>`;
+
+            metadata.authors.forEach(author => {
+                output += `
+            <rdf:li><rdf:Description><dc:creator>${author}</dc:creator></rdf:Description></rdf:li>`;
+            });
+
+            output += `
+        </rdf:Seq>
+    </dc:creator>
+</bib:Thesis>
+</rdf:RDF>`;
+
+            return output;
+        }
+
+        function generateCSLJSON(metadata) {
+            const jsonOutput = [{
+                "type": "thesis", 
+                "id": metadata.abstractUrl || crypto.randomUUID(),
+                "title": metadata.title,
+                "author": metadata.authors.map(author => {
+                    const parts = author.split(', ');
+                    const family = parts[0];
+                    const given = parts.slice(1).join(' ');
+                    return { "family": family, "given": given };
+                }),
+                "issued": {
+                    "date-parts": [metadata.publicationDate.split('-').map(Number)]
+                },
+                "publisher": metadata.publisher,
+                "note": metadata.description,
+                "URL": metadata.abstractUrl,
+                "abstract": metadata.description
+            }];
+            return JSON.stringify(jsonOutput, null, 2);
+        }
+
+        function generateEndNoteXML(metadata) {
+            let authorsXml = metadata.authors.map(author => 
+                `      <author><style face="normal" font="default" size="100%">${author}</style></author>`
+            ).join('\n');
+
+            const year = metadata.publicationDate ? `<year><style face="normal" font="default" size="100%">${metadata.publicationDate.substring(0, 4)}</style></year>` : '';
+            const url = metadata.abstractUrl ? `<urls><web-urls><url><style face="normal" font="default" size="100%">${metadata.abstractUrl}</style></url></web-urls></urls>` : '';
+            const abs = metadata.description ? `<abstract><style face="normal" font="default" size="100%">${metadata.description}</style></abstract>` : '';
+            const pub = metadata.publisher ? `<publisher><style face="normal" font="default" size="100%">${metadata.publisher}</style></publisher>` : '';
+
+            return `<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <records>
+    <record>
+      <database name="DSpace-Export.enl"/>
+      <source-app name="GeneradorCitas" version="1.0"/>
+      <rec-number>${Math.floor(Math.random() * 10000)}</rec-number>
+      <ref-type name="Thesis" id="26"/>
+      <contributors>
+        <authors>
+${authorsXml}
+        </authors>
+      </contributors>
+      <titles>
+        <title><style face="normal" font="default" size="100%">${metadata.title || ''}</style></title>
+      </titles>
+      <dates>
+        ${year}
+      </dates>
+      <pub-dates>
+        <date><style face="normal" font="default" size="100%">${metadata.publicationDate || ''}</style></date>
+      </pub-dates>
+      ${pub ? `<secondary-title><style face="normal" font="default" size="100%">${pub}</style></secondary-title>` : ''}
+      ${abs}
+      ${url}
+      <keywords>
+        ${metadata.keywords ? metadata.keywords.split('; ').map(k => `      <keyword><style face="normal" font="default" size="100%">${k.trim()}</style></keyword>`).join('\n') : ''}
+      </keywords>
+    </record>
+  </records>
+</xml>`;
+        }
+
+        // Descarga la cita en el formato especificado
+        function downloadCitation(format) {
+            const metadata = getMetadata();
+            let content = "";
+            let filename = "";
+            let mimeType = "text/plain";
+
+            // Ocultar todos los dropdowns
+            document.getElementById('styleDropdownMenu').classList.add('hidden');
+            document.getElementById('downloadDropdownMenu').classList.add('hidden');
+
+            // Usa el título, pero limpia espacios y caracteres especiales para el nombre del archivo
+            const safeTitle = metadata.title.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 30);
+
+
+            switch (format) {
+                case "bibtex":
+                    content = generateBibTeX(metadata);
+                    filename = safeTitle + ".bib";
+                    break;
+                case "ris":
+                    content = generateRIS(metadata);
+                    filename = safeTitle + ".ris";
+                    break;
+                case "zotero_rdf":
+                    content = generateZoteroRDF(metadata);
+                    filename = safeTitle + ".rdf";
+                    mimeType = "application/rdf+xml";
+                    break;
+                case "csl_json":
+                    content = generateCSLJSON(metadata);
+                    filename = safeTitle + ".json";
+                    mimeType = "application/json";
+                    break;
+                case "endnote_xml":
+                    content = generateEndNoteXML(metadata);
+                    filename = safeTitle + ".xml";
+                    mimeType = "application/xml";
+                    break;
+                case "endnote":
+                    content = generateEndNote(metadata);
+                    filename = safeTitle + ".enw";
+                    break;
+                default:
+                    showMessage("Formato de cita desconocido.");
+                    return;
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
